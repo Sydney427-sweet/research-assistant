@@ -5,6 +5,7 @@ from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from reranker import rerank
 
 load_dotenv()
 
@@ -17,7 +18,7 @@ def load_vectorstore():
 def build_rag_chain(vectorstore):
     retriever = vectorstore.as_retriever(
         search_type="similarity",
-        search_kwargs={"k": 4}  # fetch top 4 most relevant chunks
+        search_kwargs={"k": 10}  # fetch 10 so reranker has room to work
     )
 
     prompt = PromptTemplate.from_template("""
@@ -36,14 +37,16 @@ Answer:
 
     llm = ChatOllama(model="llama3.2", temperature=0)
 
-    def format_docs(docs):
+    def retrieve_and_rerank(question):
+        chunks = retriever.invoke(question)
+        reranked = rerank(question, chunks, top_k=4)
         return "\n\n---\n\n".join(
-            f"[Chunk {i+1}]: {doc.page_content}"
-            for i, doc in enumerate(docs)
+            f"[Chunk {i+1}]: {chunk.page_content}"
+            for i, chunk in enumerate(reranked)
         )
 
     chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        {"context": retrieve_and_rerank, "question": RunnablePassthrough()}
         | prompt
         | llm
         | StrOutputParser()
@@ -56,18 +59,14 @@ def ask(question: str):
     chain, retriever = build_rag_chain(vectorstore)
 
     print(f"\n🔍 Question: {question}")
-    print("⏳ Retrieving and generating...\n")
+    print("⏳ Retrieving, reranking, and generating...\n")
 
-    # get retrieved chunks for transparency
     chunks = retriever.invoke(question)
-    print("📄 Retrieved chunks:")
-    for i, chunk in enumerate(chunks):
-        print(f"  [{i+1}] ...{chunk.page_content[:120]}...")
-
-    # get the answer
+    reranked_chunks = rerank(question, chunks, top_k=4)
     answer = chain.invoke(question)
+
     print(f"\n💬 Answer:\n{answer}")
-    return answer, chunks
+    return answer, reranked_chunks
 
 if __name__ == "__main__":
     question = input("Ask a question about your documents: ")
