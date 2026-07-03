@@ -40,7 +40,7 @@ Answer:
 
     def retrieve_and_rerank(question):
         chunks = retriever.invoke(question)
-        reranked = rerank(question, chunks, top_k=4)
+        reranked, _ = rerank(question, chunks, top_k=4)
         return "\n\n---\n\n".join(
             f"[Chunk {i+1}]: {chunk.page_content}"
             for i, chunk in enumerate(reranked)

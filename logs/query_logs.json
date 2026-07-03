@@ -1,0 +1,38 @@
+[
+  {
+    "timestamp": "2026-07-03T02:00:09.965571",
+    "question": "tell me about language digital twin",
+    "answer": "According to Chunk 1: \"We model a language-based digital twin using an LLM to mimic the conversational style and linguistic behavior of an individual. We adopt GPT-4.1-minias as the base model and adapt it through supervised fine-tuning.\"\n\nThis is the information provided about Language Digital Twin in the context.",
+    "latency": {
+      "retrieval_ms": 740.33,
+      "rerank_ms": 723.1,
+      "generation_ms": 75283.54,
+      "total_ms": 76747.61
+    },
+    "reranker_scores": [
+      5.143,
+      4.787,
+      4.758,
+      4.415
+    ],
+    "num_chunks": 4
+  },
+  {
+    "timestamp": "2026-07-03T02:04:12.699322",
+    "question": "what is a dataset",
+    "answer": "I don't have enough information to answer that. The context only mentions \"conversational data\" as an example of a type of data, but it doesn't explicitly define what a dataset is.",
+    "latency": {
+      "retrieval_ms": 1526.36,
+      "rerank_ms": 1313.41,
+      "generation_ms": 81176.94,
+      "total_ms": 84017.82
+    },
+    "reranker_scores": [
+      -6.495,
+      -6.89,
+      -8.062,
+      -9.06
+    ],
+    "num_chunks": 4
+  }
+]
