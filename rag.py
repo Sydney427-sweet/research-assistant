@@ -6,6 +6,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from reranker import rerank
+import os
 
 load_dotenv()
 
@@ -34,8 +35,8 @@ Question:
 
 Answer:
 """)
-
-    llm = ChatOllama(model="llama3.2", temperature=0)
+    ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+    llm = ChatOllama(model="llama3.2", temperature=0, base_url=ollama_host)
 
     def retrieve_and_rerank(question):
         chunks = retriever.invoke(question)

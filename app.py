@@ -1,5 +1,6 @@
 import streamlit as st
 from rag import ask, load_vectorstore, build_rag_chain
+from reranker import rerank
 
 st.set_page_config(
     page_title="Research Assistant",
@@ -43,8 +44,7 @@ if question := st.chat_input("Ask a question about your documents..."):
     # generate answer
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            from reranker import rerank
-            raw_chucks = st.session_state.retriever.invoke(question)
+            raw_chunks = st.session_state.retriever.invoke(question)
             chunks = rerank(question, raw_chunks, top_k=4)
             answer = st.session_state.chain.invoke(question)
 
