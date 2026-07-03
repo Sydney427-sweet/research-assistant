@@ -1,5 +1,5 @@
 # 🧠 Personal Research Assistant
-
+![RAG Evaluation](https://github.com/Sydney427-sweet/research-assistant/actions/workflows/eval.yml/badge.svg)
 A fully local RAG (Retrieval-Augmented Generation) system that lets you chat
 with your own PDF documents — no API keys, no cloud, runs entirely on your machine.
 
