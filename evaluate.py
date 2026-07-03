@@ -5,6 +5,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from test_questions import eval_dataset
 from rag import load_vectorstore, build_rag_chain
+import os
+
 
 load_dotenv()
 
@@ -82,6 +84,18 @@ def run_evaluation():
     print(f"  Context Recall:   {np.mean(recall_scores):.3f}  (1.0 = perfect)")
     print("=" * 60)
     print("\n💡 Try changing chunk_size in ingest.py and re-run to see scores shift")
-
+    
+    # write results to file for CI artifact
+    import json
+    os.makedirs("logs", exist_ok=True)
+    with open("logs/eval_results.json", "w") as f:
+        json.dump({
+            "faithfulness": float(np.mean(faithfulness_scores)),
+            "answer_relevancy": float(np.mean(relevancy_scores)),
+            "context_recall": float(np.mean(recall_scores))
+        }, f, indent=2)
+    print("\n✅ Results saved to logs/eval_results.json")
+     
 if __name__ == "__main__":
     run_evaluation()
+

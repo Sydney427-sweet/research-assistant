@@ -1,0 +1,49 @@
+name: RAG Evaluation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install langchain langchain-core langchain-community \
+            langchain-ollama langchain-huggingface sentence-transformers \
+            chromadb pypdf python-dotenv scikit-learn numpy
+
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve &
+          sleep 5
+          ollama pull llama3.2
+
+      - name: Run ingestion
+        run: python3 ingest.py
+        env:
+          OLLAMA_HOST: http://localhost:11434
+
+      - name: Run evaluation
+        run: python3 evaluate.py
+        env:
+          OLLAMA_HOST: http://localhost:11434
+
+      - name: Upload evaluation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: logs/
